@@ -9,27 +9,27 @@ const badgeVariants = cva(
       variant: {
         default: 'bg-white/10 text-white/80 border border-white/10',
         primary: 'bg-primary/15 text-primary border border-primary/20',
-        success: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
-        warning: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
-        danger: 'bg-red-500/15 text-red-400 border border-red-500/20',
-        info: 'bg-sky-500/15 text-sky-400 border border-sky-500/20',
+        success: 'bg-success/15 text-success border border-success/20',
+        warning: 'bg-warning/15 text-warning border border-warning/20',
+        danger: 'bg-danger/15 text-danger border border-danger/20',
         purple: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
-        outline: 'bg-transparent text-white/70 border border-white/20',
+        outline: 'bg-transparent text-muted border border-white/15',
       },
     },
-    defaultVariants: {
-      variant: 'default',
-    },
+    defaultVariants: { variant: 'default' },
   }
 );
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {}
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {
+  dot?: boolean;
+}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
+function Badge({ className, variant, dot, children, ...props }: BadgeProps) {
   return (
-    <span className={cn(badgeVariants({ variant }), className)} {...props} />
+    <span className={cn(badgeVariants({ variant }), className)} {...props}>
+      {dot && <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current" />}
+      {children}
+    </span>
   );
 }
 

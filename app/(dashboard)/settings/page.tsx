@@ -1,122 +1,65 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { getProfile } from '@/lib/supabase/server';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { User, Mail, Calendar, Globe, Shield, CreditCard, Settings, LogOut, Zap } from 'lucide-react';
 
-import { motion } from 'framer-motion';
-import {
-  User,
-  Bell,
-  Palette,
-  ShieldAlert,
-  CreditCard,
-  Link2,
-} from 'lucide-react';
-import Link from 'next/link';
-import {
-  ProfileSettings,
-  NotificationSettings,
-  AppearanceSettings,
-  DangerZone,
-} from '@/components/settings';
+export default async function SettingsPage() {
+  const profile = await getProfile();
+  if (!profile) redirect('/login');
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
-
-export default function SettingsPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Page header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="mb-8"
-      >
-        <h1 className="text-3xl font-bold text-white">Settings</h1>
-        <p className="mt-1 text-sm text-muted">
-          Manage your account, preferences, and data.
-        </p>
-      </motion.div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-white flex items-center gap-2"><Settings className="h-7 w-7" /> Settings</h1>
+        <p className="mt-1 text-muted">Manage your account and preferences</p>
+      </div>
 
-      {/* Quick links */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="mb-8 flex flex-wrap gap-3"
-      >
-        <QuickLink href="#profile" icon={<User className="h-4 w-4" />} label="Profile" />
-        <QuickLink href="#notifications" icon={<Bell className="h-4 w-4" />} label="Notifications" />
-        <QuickLink href="#appearance" icon={<Palette className="h-4 w-4" />} label="Appearance" />
-        <QuickLink href="/settings/billing" icon={<CreditCard className="h-4 w-4" />} label="Billing" external />
-        <QuickLink href="#danger" icon={<ShieldAlert className="h-4 w-4" />} label="Danger Zone" />
-      </motion.div>
+      {/* Profile */}
+      <Card variant="glass" padding="lg">
+        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2"><User className="h-5 w-5 text-primary" /> Profile</h2>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-glow text-2xl font-bold text-white">
+            {(profile.first_name?.[0] || 'U').toUpperCase()}{(profile.last_name?.[0] || '').toUpperCase()}
+          </div>
+          <div>
+            <h3 className="font-semibold text-white">{profile.first_name} {profile.last_name}</h3>
+            <p className="text-sm text-muted">@{profile.username}</p>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input label="First Name" defaultValue={profile.first_name || ''} />
+          <Input label="Last Name" defaultValue={profile.last_name || ''} />
+          <Input label="Username" defaultValue={profile.username || ''} />
+          <Input label="Email" defaultValue={profile.email} disabled hint="Managed by authentication" />
+          <Input label="Date of Birth" type="date" defaultValue={profile.date_of_birth || ''} />
+          <Input label="Country" defaultValue={profile.country || ''} />
+        </div>
+        <Button className="mt-4">Save Changes</Button>
+      </Card>
 
-      {/* Settings sections */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="space-y-6"
-      >
-        <motion.div variants={itemVariants} id="profile">
-          <ProfileSettings />
-        </motion.div>
+      {/* Subscription */}
+      <Card variant="glass" padding="lg">
+        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2"><CreditCard className="h-5 w-5 text-primary" /> Subscription</h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-white font-medium">Current Plan: <span className="text-primary capitalize">{profile.plan_type}</span></p>
+            <p className="text-sm text-muted">{profile.is_student_verified ? 'Verified student — Premium active' : 'Upgrade for more features'}</p>
+          </div>
+          <Badge variant={profile.plan_type === 'free' ? 'outline' : 'primary'} className="capitalize">{profile.plan_type}</Badge>
+        </div>
+      </Card>
 
-        <motion.div variants={itemVariants} id="notifications">
-          <NotificationSettings />
-        </motion.div>
-
-        <motion.div variants={itemVariants} id="appearance">
-          <AppearanceSettings />
-        </motion.div>
-
-        <motion.div variants={itemVariants} id="danger">
-          <DangerZone />
-        </motion.div>
-      </motion.div>
+      {/* Admin Link (only for admins) */}
+      {profile.role === 'admin' && (
+        <Card variant="glass" padding="lg" className="border-primary/20">
+          <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Admin Panel</h2>
+          <p className="text-sm text-muted mb-4">You have admin access. Manage students, users, and announcements.</p>
+          <Button variant="outline" size="sm">Go to Admin Panel</Button>
+        </Card>
+      )}
     </div>
-  );
-}
-
-function QuickLink({
-  href,
-  icon,
-  label,
-  external = false,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  external?: boolean;
-}) {
-  const classes =
-    'inline-flex items-center gap-2 rounded-full border border-white/10 bg-cards/60 px-4 py-2 text-sm font-medium text-white/70 transition-all hover:border-glow/30 hover:bg-cards hover:text-white hover:shadow-glow';
-
-  if (external) {
-    return (
-      <Link href={href} className={classes}>
-        {icon}
-        {label}
-        <Link2 className="h-3 w-3 opacity-50" />
-      </Link>
-    );
-  }
-
-  return (
-    <a href={href} className={classes}>
-      {icon}
-      {label}
-    </a>
   );
 }

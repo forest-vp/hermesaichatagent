@@ -15,27 +15,40 @@ const config: Config = {
         glow: '#60A5FA',
         text: '#FFFFFF',
         muted: '#A1A1AA',
+        success: '#10B981',
+        warning: '#F59E0B',
+        danger: '#EF4444',
       },
       boxShadow: {
-        glow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 30px rgba(59, 130, 246, 0.2)',
-        'glow-lg': '0 0 25px rgba(96, 165, 250, 0.5), 0 0 50px rgba(59, 130, 246, 0.3), 0 0 75px rgba(59, 130, 246, 0.1)',
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        glow: '0 0 20px rgba(59, 130, 246, 0.3)',
+        'glow-lg': '0 0 40px rgba(59, 130, 246, 0.4)',
+        'glow-sm': '0 0 10px rgba(59, 130, 246, 0.2)',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-10px)' },
         },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        'glow-pulse': {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' },
+          '50%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.6)' },
+        },
+      },
+      backgroundImage: {
+        'grid-pattern': 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
       },
     },
   },
   plugins: [],
 };
-
 export default config;
