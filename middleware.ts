@@ -22,20 +22,24 @@ export async function middleware(request: NextRequest) {
       },
     }
   );
-  const { data: { user } } = await supabase.auth.getUser();
-  const protectedRoutes = ['/dashboard', '/admin', '/settings', '/verify-student'];
-  const authRoutes = ['/login', '/register'];
-  const isProtected = protectedRoutes.some(r => request.nextUrl.pathname.startsWith(r));
-  const isAuth = authRoutes.some(r => request.nextUrl.pathname.startsWith(r));
-  if (isProtected && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
-  }
-  if (isAuth && user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
-    return NextResponse.redirect(url);
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    const protectedRoutes = ['/dashboard', '/admin', '/settings', '/verify-student'];
+    const authRoutes = ['/login', '/register'];
+    const isProtected = protectedRoutes.some(r => request.nextUrl.pathname.startsWith(r));
+    const isAuth = authRoutes.some(r => request.nextUrl.pathname.startsWith(r));
+    if (isProtected && !user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+    if (isAuth && user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/dashboard';
+      return NextResponse.redirect(url);
+    }
+  } catch {
+    // If Supabase auth fails, allow the request through
   }
   return response;
 }
